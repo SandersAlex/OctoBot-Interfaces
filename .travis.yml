@@ -1,0 +1,32 @@
+notifications:
+  email: false
+sudo: enabled
+os: linux
+language: python
+python: 3.7-dev
+install:
+  - python3 -m pip install --upgrade -r requirements.txt -r dev_requirements.txt
+
+matrix:
+  include:
+    - name: "Linux - Python 3 nightly"
+      os: linux
+      python: nightly
+      language: python
+      script:
+        - python3 setup.py install
+
+deploy:
+  - provider: pypi
+    username:
+      secure: erEZxpmlXCxjBzo+HwUso+hsQatNj7oT5GTxdh+DJj7AI5wLqvh1o4Xs9NQFbMyb10e9agmCLoqNlOewWVYgfzWdUMD5+YNf+PwoRhL6QkPwPjxyWBr5P+eGLI3VLNmyjaTyJnns03Z1BMukbi6+uRub8CGXHJcr2kYgqHUg9YCgvJc4vMWnYbdbU4uFt6T0GVWrjwXXUwzdsLgzLVC3N4Q9xxWivO5sUWMBSE7OlJVEvkO6uY/NwuO7ArSnJf4wOHbactT6fFs51MfG4ewQWCqCHLGPqi1PWerTiz70ANP1TarEWbppatlX/7C+KoOspjLpquS91UI7rKKNLUFkeVhYZK6kifcwpaFijsfea+gXCuoNFNrH84pP9UaDftlfYEfQbB976HNJwSDpXCbFD3FF7NClvOY3VqHFuPOcDb2ASqXGIgxL4vrnyJ+cQ/tRerGNz+acT2FtJMDwv8TwyZgHoC/pzQfu+rDUc9apb9wupiqt9LwjMNW1Evg0sNVcoARUfX68ePoWiwvdaNdwC9o7ClFFcbKdhA6pzEs+XaqmQ7Fqq/L05x2mz9PIqvA3V+cvynXoJZglDRFsQf0TvHbVpejILvxKISCWk18bnRKidpcUupzISJA0sY43qxjZWkMF5ynA+/rqPEDS5rh7D4fBwEVI3nm8OectzskRkZw=
+    password:
+      secure: I+9kdj/NkXpctN9yUcpPAtvrbJ8IAndxVNdePK7Qw0opcKcxlA/zxtwz08Ou1R7Amy0KGCxILcyMRiqs//2/CKYBrgtVtZi44LWeoVeKzBHRYXPSpxq3RdUSIjT9UeNMbq5b+xf7wnwpNp/lW7xat/vgmsvctFenyxCHrEA97Bcq+5sYahSrhThwkvpebbJ/FKgqvP/yaJW8xjxnZW4YHWSTdhL5q5S4lCSsHiYyd/LjI+G3idZPAggmLXaFTiSGpEa8SQPI6fwZhJ8YWN4h8WCQ8292Y+dsbdumlnxqaVuorvvZVadKim/f8GuM44OJdLNS2hhBBJ3CKx0TppC9R+1I5444wIfArjpC4m0Ln5gON9waELZzfaLPVJYpKKsrZciTwVpKRcsehPtrIjRdX7zNBN8tkiUPehVtoALVzksCgE2lgs/4OI2TeCbCDRLmPfB2a593S3PPIg2bXQeJk8kHNKYaNPqgLB/2704ZG36+0Gk3Nt+ofnJ0NIddy6Gw3W8lxCq19pItap5kOybGoq8NXIIW9MDi7hH2ACK/SKb3TsjV/E3ZrhkHOnlI4oPcoUq1xnvyf981bc3paziHrV/TyU7KQr/uXjpp90GCOFraoVd6AVxOa/p75ImtoyT/CJ6kQeYsgdEPKRviFOfBfsPWmokXHHfvLwYnFNn1o2s=
+    skip_existing: true
+    skip_cleanup: true
+    distributions: "sdist"
+    on:
+      repo: Drakkar-Software/OctoBot-Notifications
+      branch: master
+      tags: true
+      condition: $TRAVIS_OS_NAME = 'linux'
