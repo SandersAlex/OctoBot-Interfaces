@@ -4,29 +4,99 @@ sudo: enabled
 os: linux
 language: python
 python: 3.7-dev
+cache: pip
+env:
+  global:
+    - GH_REPO=Drakkar-Software/OctoBot-Interfaces
+    - DEPLOY_BRANCH=master
+    - PACKAGE_FOLDER=octobot_interfaces
+    - secure: erEZxpmlXCxjBzo+HwUso+hsQatNj7oT5GTxdh+DJj7AI5wLqvh1o4Xs9NQFbMyb10e9agmCLoqNlOewWVYgfzWdUMD5+YNf+PwoRhL6QkPwPjxyWBr5P+eGLI3VLNmyjaTyJnns03Z1BMukbi6+uRub8CGXHJcr2kYgqHUg9YCgvJc4vMWnYbdbU4uFt6T0GVWrjwXXUwzdsLgzLVC3N4Q9xxWivO5sUWMBSE7OlJVEvkO6uY/NwuO7ArSnJf4wOHbactT6fFs51MfG4ewQWCqCHLGPqi1PWerTiz70ANP1TarEWbppatlX/7C+KoOspjLpquS91UI7rKKNLUFkeVhYZK6kifcwpaFijsfea+gXCuoNFNrH84pP9UaDftlfYEfQbB976HNJwSDpXCbFD3FF7NClvOY3VqHFuPOcDb2ASqXGIgxL4vrnyJ+cQ/tRerGNz+acT2FtJMDwv8TwyZgHoC/pzQfu+rDUc9apb9wupiqt9LwjMNW1Evg0sNVcoARUfX68ePoWiwvdaNdwC9o7ClFFcbKdhA6pzEs+XaqmQ7Fqq/L05x2mz9PIqvA3V+cvynXoJZglDRFsQf0TvHbVpejILvxKISCWk18bnRKidpcUupzISJA0sY43qxjZWkMF5ynA+/rqPEDS5rh7D4fBwEVI3nm8OectzskRkZw=
+    - secure: I+9kdj/NkXpctN9yUcpPAtvrbJ8IAndxVNdePK7Qw0opcKcxlA/zxtwz08Ou1R7Amy0KGCxILcyMRiqs//2/CKYBrgtVtZi44LWeoVeKzBHRYXPSpxq3RdUSIjT9UeNMbq5b+xf7wnwpNp/lW7xat/vgmsvctFenyxCHrEA97Bcq+5sYahSrhThwkvpebbJ/FKgqvP/yaJW8xjxnZW4YHWSTdhL5q5S4lCSsHiYyd/LjI+G3idZPAggmLXaFTiSGpEa8SQPI6fwZhJ8YWN4h8WCQ8292Y+dsbdumlnxqaVuorvvZVadKim/f8GuM44OJdLNS2hhBBJ3CKx0TppC9R+1I5444wIfArjpC4m0Ln5gON9waELZzfaLPVJYpKKsrZciTwVpKRcsehPtrIjRdX7zNBN8tkiUPehVtoALVzksCgE2lgs/4OI2TeCbCDRLmPfB2a593S3PPIg2bXQeJk8kHNKYaNPqgLB/2704ZG36+0Gk3Nt+ofnJ0NIddy6Gw3W8lxCq19pItap5kOybGoq8NXIIW9MDi7hH2ACK/SKb3TsjV/E3ZrhkHOnlI4oPcoUq1xnvyf981bc3paziHrV/TyU7KQr/uXjpp90GCOFraoVd6AVxOa/p75ImtoyT/CJ6kQeYsgdEPKRviFOfBfsPWmokXHHfvLwYnFNn1o2s=
+
 install:
-  - python3 -m pip install --upgrade -r requirements.txt -r dev_requirements.txt
+  - python3 -m pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
 
 matrix:
   include:
-    - name: "Linux - Python 3 nightly"
+    - name: "Linux - Python 3.7-dev - Python sources"
+      stage: test
       os: linux
-      python: nightly
+      python: 3.7-dev
+      language: python
+      script:
+        - pytest --cov=. --cov-config=.coveragerc --durations=0 -rw tests
+      after_success:
+        - if [ $TRAVIS_PULL_REQUEST == "false" ]; then coveralls; fi
+
+    - name: "Linux - Python 3.7-dev - Installed"
+      stage: test
+      os: linux
+      python: 3.7-dev
       language: python
       script:
         - python3 setup.py install
+        - rm -rf $PACKAGE_FOLDER
+        - pytest tests
 
-deploy:
-  - provider: pypi
-    username:
-      secure: erEZxpmlXCxjBzo+HwUso+hsQatNj7oT5GTxdh+DJj7AI5wLqvh1o4Xs9NQFbMyb10e9agmCLoqNlOewWVYgfzWdUMD5+YNf+PwoRhL6QkPwPjxyWBr5P+eGLI3VLNmyjaTyJnns03Z1BMukbi6+uRub8CGXHJcr2kYgqHUg9YCgvJc4vMWnYbdbU4uFt6T0GVWrjwXXUwzdsLgzLVC3N4Q9xxWivO5sUWMBSE7OlJVEvkO6uY/NwuO7ArSnJf4wOHbactT6fFs51MfG4ewQWCqCHLGPqi1PWerTiz70ANP1TarEWbppatlX/7C+KoOspjLpquS91UI7rKKNLUFkeVhYZK6kifcwpaFijsfea+gXCuoNFNrH84pP9UaDftlfYEfQbB976HNJwSDpXCbFD3FF7NClvOY3VqHFuPOcDb2ASqXGIgxL4vrnyJ+cQ/tRerGNz+acT2FtJMDwv8TwyZgHoC/pzQfu+rDUc9apb9wupiqt9LwjMNW1Evg0sNVcoARUfX68ePoWiwvdaNdwC9o7ClFFcbKdhA6pzEs+XaqmQ7Fqq/L05x2mz9PIqvA3V+cvynXoJZglDRFsQf0TvHbVpejILvxKISCWk18bnRKidpcUupzISJA0sY43qxjZWkMF5ynA+/rqPEDS5rh7D4fBwEVI3nm8OectzskRkZw=
-    password:
-      secure: I+9kdj/NkXpctN9yUcpPAtvrbJ8IAndxVNdePK7Qw0opcKcxlA/zxtwz08Ou1R7Amy0KGCxILcyMRiqs//2/CKYBrgtVtZi44LWeoVeKzBHRYXPSpxq3RdUSIjT9UeNMbq5b+xf7wnwpNp/lW7xat/vgmsvctFenyxCHrEA97Bcq+5sYahSrhThwkvpebbJ/FKgqvP/yaJW8xjxnZW4YHWSTdhL5q5S4lCSsHiYyd/LjI+G3idZPAggmLXaFTiSGpEa8SQPI6fwZhJ8YWN4h8WCQ8292Y+dsbdumlnxqaVuorvvZVadKim/f8GuM44OJdLNS2hhBBJ3CKx0TppC9R+1I5444wIfArjpC4m0Ln5gON9waELZzfaLPVJYpKKsrZciTwVpKRcsehPtrIjRdX7zNBN8tkiUPehVtoALVzksCgE2lgs/4OI2TeCbCDRLmPfB2a593S3PPIg2bXQeJk8kHNKYaNPqgLB/2704ZG36+0Gk3Nt+ofnJ0NIddy6Gw3W8lxCq19pItap5kOybGoq8NXIIW9MDi7hH2ACK/SKb3TsjV/E3ZrhkHOnlI4oPcoUq1xnvyf981bc3paziHrV/TyU7KQr/uXjpp90GCOFraoVd6AVxOa/p75ImtoyT/CJ6kQeYsgdEPKRviFOfBfsPWmokXHHfvLwYnFNn1o2s=
-    skip_existing: true
-    skip_cleanup: true
-    distributions: "sdist"
-    on:
-      repo: Drakkar-Software/OctoBot-Notifications
-      branch: master
-      tags: true
-      condition: $TRAVIS_OS_NAME = 'linux'
+    - name: "Linux - Python 3.7-dev - Deploy"
+      stage: deploy
+      script:
+        - ls
+      deploy:
+        - provider: pypi
+          user: "__token__"
+          password:
+            secure: HHlsEgI/sKI1iG5y571xXlokPZN6nwT4wCeG1oLFX6gEJTMnyWDq8wSiqaaIiOMcs6MWA/pQI6wf4yL0a2lXZMiNQIEC+Q64Iln1leNBXbDDsNYXPHPhsb2ZIPkVf2PFFIUCp+7kNQk7+h/5Px3wmoLs2WZbqy2vMHA4fGKwA3/xrwbjovQTJbDkonyZPzPCo30jsbl5jH/IzH1Lv2hn1xK7yS2w3y+iSV9tj2Wchcfz18OAVrb59PgaQptEzlKqujP6Khj6qV+04cTldzYh2Vd0kyYlSxmSN57EKYVyZfUkXCLm/AcJ55YfNwbrGslmPC/0g8rbmlMVGwB9cHQwBLARu3QwJZ7wW1PDiCXvJ2BTbeihh8dzOneGkgwfOe3HXD1F/7zA0I4NOuucPhcyD+EA3XVzFhNSqCOrK1E9D8pMqxn3c08+ORazdcebVojF7OAODxDOt1cldPwRjjflZ2AV6vOpZZvSKq43A9n3aXDnyTmzJF5y/Q1RjdmAgqb/bCchtUQ3COq5RA7BWtYCWnZURWy3lnjBB99G24v3dR2d1L730mjN72AIqx86bvKYU7YEiwz0ZTzlWaSXUjz78I7oDkYHuQwEnEeQ8AdA78+IJU3/lgac2XuRjkVr4MDwfJm52Y1GrayOC+JvFj9axVA6jgKOfk0WSN0qZwsTim8=
+          skip_cleanup: true
+          skip_existing: true
+          distributions: "sdist"
+          on:
+            repo: $GH_REPO
+            branch: $DEPLOY_BRANCH
+            tags: true
+            condition: $TRAVIS_OS_NAME = 'linux'
+        - provider: script
+          script: docker run -it -e PYPI_USERNAME=$PYPI_USERNAME -e PYPI_PASSWORD=$PYPI_PASSWORD -v $(pwd):/project drakkarsoftware/octobot-pypi-deploy:i686 "i686" "cp37-cp37m" "cp37"
+          skip_cleanup: true
+          skip_existing: true
+          on:
+            repo: "$GH_REPO"
+            branch: "$DEPLOY_BRANCH"
+            tags: true
+            condition: "$TRAVIS_OS_NAME = 'linux'"
+        - provider: script
+          script: docker run -it -e PYPI_USERNAME=$PYPI_USERNAME -e PYPI_PASSWORD=$PYPI_PASSWORD -v $(pwd):/project drakkarsoftware/octobot-pypi-deploy:x86_64 "x86_64" "cp37-cp37m" "cp37"
+          skip_cleanup: true
+          on:
+            repo: "$GH_REPO"
+            branch: "$DEPLOY_BRANCH"
+            tags: true
+            condition: "$TRAVIS_OS_NAME = 'linux'"
+
+    - name: "OSX - Python 3.7 - Deploy"
+      stage: deploy
+      os: osx
+      osx_image: xcode11    # Python 3.7.2 running on macOS 10.14.3
+      language: shell       # 'language: python' is an error on Travis CI macOS
+      # python: 3.7         # 'python:' is ignored on Travis CI macOS
+      before_install: python3 --version ; pip3 --version ; sw_vers
+      install:
+        - python3 -m pip install --prefer-binary --user -r requirements.txt
+        - python3 -m pip install --prefer-binary -r dev_requirements.txt
+      before_cache:
+        - rm -f "$HOME/Library/Caches/pip/log/debug.log"
+      cache:
+        directories:
+          - "$HOME/Library/Caches/pip"
+      script:
+        - python3 setup.py build_ext --inplace
+        - pytest tests
+      deploy:
+        - provider: script
+          script: python3 setup.py bdist_wheel && python3 -m twine upload dist/* -u $PYPI_USERNAME -p $PYPI_PASSWORD --skip-existing
+          skip_cleanup: true
+          on:
+            repo: "$GH_REPO"
+            branch: "$DEPLOY_BRANCH"
+            tags: true
+            condition: "$TRAVIS_OS_NAME = 'osx'"

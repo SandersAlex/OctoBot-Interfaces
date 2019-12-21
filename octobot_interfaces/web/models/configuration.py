@@ -177,7 +177,7 @@ def get_tentacle_from_string(name, with_info=True):
         klass = get_class_from_string(name, abstract_class, package, parent_inspector)
         if klass:
             if with_info:
-                info = dict()
+                info = {}
                 info[DESCRIPTION_KEY] = klass.get_description()
                 info[NAME_KEY] = name
                 for parent_class in klass.__bases__:
@@ -425,7 +425,7 @@ def get_all_symbol_list():
         }
     except Exception as e:
         LOGGER.error(f"Failed to get currencies list from coinmarketcap : {e}")
-        return dict()
+        return {}
 
 
 def get_full_exchange_list(remove_config_exchanges=False):

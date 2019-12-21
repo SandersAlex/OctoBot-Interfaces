@@ -15,10 +15,21 @@
 #  License along with this library.
 # from distutils.extension import Extension
 
+import os
+
+from setuptools import dist
+
+dist.Distribution().fetch_build_eggs(['Cython>=0.29.14'])
+
 try:
     from Cython.Distutils import build_ext
+    from Cython.Build import cythonize
 except ImportError:
     # create closure for deferred import
+    def cythonize(*args, **kwargs):
+        from Cython.Build import cythonize
+        return cythonize(*args, **kwargs)
+
     def build_ext(*args, **kwargs):
         from Cython.Distutils import build_ext
         return build_ext(*args, **kwargs)
@@ -42,6 +53,7 @@ with open('README.md', encoding='utf-8') as f:
 
 REQUIRED = open('requirements.txt').readlines()
 REQUIRES_PYTHON = '>=3.7'
+CYTHON_DEBUG = False if not os.getenv('CYTHON_DEBUG') else os.getenv('CYTHON_DEBUG')
 
 setup(
     name=PROJECT_NAME,
