@@ -13,3 +13,16 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+
+from octobot_interfaces.base.abstract_interface import AbstractInterface
+
+
+def get_exchange_managers(bot=None):
+    if bot is None:
+        return AbstractInterface.get_exchange_managers()
+    else:
+        return bot.exchange_factory.exchange_manager_list
+
+
+def run_in_bot_main_loop(coroutine):
+    return AbstractInterface.bot.run_in_main_asyncio_loop(coroutine)

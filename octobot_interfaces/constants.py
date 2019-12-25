@@ -18,3 +18,7 @@ PROJECT_NAME = "OctoBot-Interfaces"
 VERSION = "0.0.0"  # major.minor.revision
 
 PAID_FEES_STR = "Paid fees"
+
+# external resources
+EXTERNAL_RESOURCE_CURRENT_USER_FORM = "current-user-feedback-form"
+EXTERNAL_RESOURCE_PUBLIC_ANNOUNCEMENTS = "public-announcements"

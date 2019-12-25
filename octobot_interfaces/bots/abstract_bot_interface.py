@@ -19,15 +19,17 @@ from abc import ABC
 
 from octobot_commons.constants import CONFIG_ENABLED_OPTION
 from octobot_interfaces.base.abstract_interface import AbstractInterface
+from octobot_interfaces.util.order import get_all_open_orders, cancel_all_open_orders
+from octobot_interfaces.util.portfolio import get_portfolio_current_value, get_global_portfolio_currencies_amounts
+from octobot_interfaces.util.profitability import get_global_profitability
+from octobot_interfaces.util.trader import has_real_and_or_simulated_traders, get_currencies_with_status, get_risk, \
+    force_real_traders_refresh, get_trades_history, set_risk, set_enable_trading, get_total_paid_fees, \
+    sell_all_currencies, sell_all
 from octobot_trading.constants import REAL_TRADER_STR, SIMULATOR_TRADER_STR
 from octobot_trading.util import get_reference_market
 from octobot_interfaces.constants import PAID_FEES_STR
 from octobot_services.constants import CONFIG_INTERFACES, CONFIG_CATEGORY_SERVICES, CONFIG_USERNAMES_WHITELIST
 from octobot_interfaces.bots import EOL, NO_CURRENCIES_MESSAGE, NO_TRADER_MESSAGE
-from octobot_interfaces.util.trading import has_real_and_or_simulated_traders, get_currencies_with_status, get_risk, \
-    force_real_traders_refresh, get_trades_history, get_global_portfolio_currencies_amounts, get_global_profitability, \
-    set_risk, set_enable_trading, cancel_all_open_orders, get_portfolio_current_value, get_all_open_orders, \
-    get_total_paid_fees, sell_all_currencies, sell_all
 from octobot_commons.pretty_printer import PrettyPrinter
 from octobot_commons.timestamp_util import convert_timestamp_to_datetime
 
@@ -289,7 +291,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def get_command_version():
-        return f"{AbstractInterface._project_name} {AbstractInterface._project_version}"
+        return f"{AbstractInterface.project_name} {AbstractInterface.project_version}"
 
     @staticmethod
     def get_command_start(markdown=False):

@@ -26,8 +26,8 @@ class AbstractInterface:
 
     # references that will be shared by interfaces
     bot = None
-    _project_name = None
-    _project_version = None
+    project_name = None
+    project_version = None
 
     def __init__(self, config):
         self.config = config
@@ -57,12 +57,16 @@ class AbstractInterface:
     @staticmethod
     def initialize_global_project_data(bot, project_name, project_version):
         AbstractInterface.bot = bot
-        AbstractInterface._project_name = project_name
-        AbstractInterface._project_version = project_version
+        AbstractInterface.project_name = project_name
+        AbstractInterface.project_version = project_version
 
     @staticmethod
     def get_exchange_managers():
         return AbstractInterface.bot.exchange_factory.exchange_manager_list
+
+    @staticmethod
+    def is_bot_ready():
+        return AbstractInterface.bot.initialized
 
     @classmethod
     def get_logger(cls):
