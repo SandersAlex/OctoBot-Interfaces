@@ -15,29 +15,24 @@
 #  License along with this library.
 import copy
 import os
+from abc import ABC
 
-from config import CONFIG_INTERFACES, CONFIG_ENABLED_OPTION, CONFIG_CATEGORY_SERVICES, CONFIG_USERNAMES_WHITELIST, \
-    REAL_TRADER_STR, SIMULATOR_TRADER_STR, PROJECT_NAME, LONG_VERSION, PAID_FEES_STR
-from interfaces import get_bot, get_reference_market
-from interfaces.bots import EOL, NO_CURRENCIES_MESSAGE, NO_TRADER_MESSAGE
-from interfaces.trading_util import has_real_and_or_simulated_traders, get_currencies_with_status, get_risk, \
+from octobot_commons.constants import CONFIG_ENABLED_OPTION
+from octobot_interfaces.base.abstract_interface import AbstractInterface
+from octobot_trading.constants import REAL_TRADER_STR, SIMULATOR_TRADER_STR
+from octobot_trading.util import get_reference_market
+from octobot_interfaces.constants import PAID_FEES_STR
+from octobot_services.constants import CONFIG_INTERFACES, CONFIG_CATEGORY_SERVICES, CONFIG_USERNAMES_WHITELIST
+from octobot_interfaces.bots import EOL, NO_CURRENCIES_MESSAGE, NO_TRADER_MESSAGE
+from octobot_interfaces.util.trading import has_real_and_or_simulated_traders, get_currencies_with_status, get_risk, \
     force_real_traders_refresh, get_trades_history, get_global_portfolio_currencies_amounts, get_global_profitability, \
-    set_risk, set_enable_trading, cancel_all_open_orders, get_portfolio_current_value, get_open_orders, \
+    set_risk, set_enable_trading, cancel_all_open_orders, get_portfolio_current_value, get_all_open_orders, \
     get_total_paid_fees, sell_all_currencies, sell_all
-from octobot_commons.logging.logging_util import get_logger
 from octobot_commons.pretty_printer import PrettyPrinter
 from octobot_commons.timestamp_util import convert_timestamp_to_datetime
 
 
-class InterfaceBot:
-
-    def __init__(self, config):
-        self.config = config
-        self.paused = False
-
-    @classmethod
-    def get_logger(cls):
-        return get_logger(cls.__name__)
+class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def enable(config, is_enabled, associated_config=None):
@@ -56,7 +51,7 @@ class InterfaceBot:
 
     @staticmethod
     def _is_valid_user(user_name, associated_config=None):
-        config_interface = get_bot().get_config()[CONFIG_CATEGORY_SERVICES][associated_config]
+        config_interface = AbstractInterface.bot.get_config()[CONFIG_CATEGORY_SERVICES][associated_config]
 
         white_list = config_interface[CONFIG_USERNAMES_WHITELIST] \
             if CONFIG_USERNAMES_WHITELIST in config_interface else None
@@ -78,25 +73,25 @@ class InterfaceBot:
             message += f"{c}- Simulated trader{c}{EOL}"
 
         message += f"{EOL}{b}Exchanges:{b}{EOL}"
-        for exchange in get_bot().get_exchanges_list().values():
+        for exchange in AbstractInterface.bot.get_exchanges_list().values():
             message += f"{c}- {exchange.get_name()}{c}{EOL}"
 
         message += f"{EOL}{b}Evaluators:{b}{EOL}"
-        first_evaluator = next(iter(get_bot().get_symbols_tasks_manager().values())).get_evaluator()
+        first_evaluator = next(iter(AbstractInterface.bot.get_symbols_tasks_manager().values())).get_evaluator()
         evaluators = copy.copy(first_evaluator.get_social_eval_list())
         evaluators += first_evaluator.get_ta_eval_list()
         evaluators += first_evaluator.get_real_time_eval_list()
         for evaluator in evaluators:
             message += f"{c}- {evaluator.get_name()}{c}{EOL}"
 
-        first_symbol_evaluator = next(iter(get_bot().get_symbol_evaluator_list().values()))
-        first_exchange = next(iter(get_bot().get_exchanges_list().values()))
+        first_symbol_evaluator = next(iter(AbstractInterface.bot.get_symbol_evaluator_list().values()))
+        first_exchange = next(iter(AbstractInterface.bot.get_exchanges_list().values()))
         message += f"{EOL}{b}Strategies:{b}{EOL}"
         for strategy in first_symbol_evaluator.get_strategies_eval_list(first_exchange):
             message += f"{c}- {strategy.get_name()}{c}{EOL}"
 
         message += f"{EOL}{b}Trading mode:{b}{EOL}"
-        message += f"{c}- {next(iter(get_bot().get_exchange_trading_modes().values())).get_name()}{c}"
+        message += f"{c}- {next(iter(AbstractInterface.bot.get_exchange_trading_modes().values())).get_name()}{c}"
 
         return message
 
@@ -134,11 +129,11 @@ class InterfaceBot:
 
         trades_history_string = ""
         if has_real_trader:
-            trades_history_string += InterfaceBot._print_trades(real_trades_history, REAL_TRADER_STR, markdown)
+            trades_history_string += AbstractBotInterface._print_trades(real_trades_history, REAL_TRADER_STR, markdown)
 
         if has_simulated_trader:
             trades_history_string += \
-                f"{EOL}{InterfaceBot._print_trades(simulated_trades_history, SIMULATOR_TRADER_STR, markdown)}"
+                f"{EOL}{AbstractBotInterface._print_trades(simulated_trades_history, SIMULATOR_TRADER_STR, markdown)}"
 
         if not trades_history_string:
             trades_history_string = NO_TRADER_MESSAGE
@@ -160,15 +155,19 @@ class InterfaceBot:
     def get_command_open_orders(markdown=False):
         _, b, c = PrettyPrinter.get_markets(markdown)
         has_real_trader, has_simulated_trader = has_real_and_or_simulated_traders()
-        portfolio_real_open_orders, portfolio_simulated_open_orders = get_open_orders()
+        portfolio_real_open_orders, portfolio_simulated_open_orders = get_all_open_orders()
 
         orders_string = ""
         if has_real_trader:
-            orders_string += InterfaceBot._print_open_orders(portfolio_real_open_orders, REAL_TRADER_STR, markdown)
+            orders_string += AbstractBotInterface._print_open_orders(portfolio_real_open_orders,
+                                                                     REAL_TRADER_STR,
+                                                                     markdown)
 
         if has_simulated_trader:
-            orders_string += f"{EOL}" \
-                f"{InterfaceBot._print_open_orders(portfolio_simulated_open_orders, SIMULATOR_TRADER_STR, markdown)}"
+            message = AbstractBotInterface._print_open_orders(portfolio_simulated_open_orders,
+                                                              SIMULATOR_TRADER_STR,
+                                                              markdown)
+            orders_string += f"{EOL}{message}"
 
         if not orders_string:
             orders_string = NO_TRADER_MESSAGE
@@ -236,11 +235,11 @@ class InterfaceBot:
 
         portfolios_string = ""
         if has_real_trader:
-            portfolios_string += InterfaceBot._print_portfolio(portfolio_real_current_value, reference_market,
+            portfolios_string += AbstractBotInterface._print_portfolio(portfolio_real_current_value, reference_market,
                                                                real_global_portfolio, REAL_TRADER_STR, markdown)
 
         if has_simulated_trader:
-            portfolio_str = InterfaceBot._print_portfolio(portfolio_simulated_current_value, reference_market,
+            portfolio_str = AbstractBotInterface._print_portfolio(portfolio_simulated_current_value, reference_market,
                                                           simulated_global_portfolio, SIMULATOR_TRADER_STR, markdown)
             portfolios_string += f"{EOL}{portfolio_str}"
 
@@ -285,11 +284,12 @@ class InterfaceBot:
 
     @staticmethod
     def get_command_ping():
-        return f"I'm alive since {convert_timestamp_to_datetime(get_bot().start_time, '%Y-%m-%d %H:%M:%S')}."
+        return f"I'm alive since " \
+               f"{convert_timestamp_to_datetime(AbstractInterface.bot.start_time, '%Y-%m-%d %H:%M:%S')}."
 
     @staticmethod
     def get_command_version():
-        return f"{PROJECT_NAME} {LONG_VERSION}"
+        return f"{AbstractInterface._project_name} {AbstractInterface._project_version}"
 
     @staticmethod
     def get_command_start(markdown=False):
@@ -308,7 +308,7 @@ class InterfaceBot:
 
     @staticmethod
     def set_command_stop():
-        get_bot().stop()
+        AbstractInterface.bot.stop()
         return os._exit(0)
 
     def set_command_pause(self):
@@ -335,7 +335,7 @@ class InterfaceBot:
 
             if end_index < len(message) - 1:
                 remaining = message[end_index+1:]
-                return messages_list + InterfaceBot._split_messages_if_too_long(remaining, max_length,
+                return messages_list + AbstractBotInterface._split_messages_if_too_long(remaining, max_length,
                                                                                 preferred_separator)
             else:
                 return messages_list

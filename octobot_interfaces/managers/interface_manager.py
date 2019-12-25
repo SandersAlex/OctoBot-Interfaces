@@ -1,4 +1,4 @@
-#  Drakkar-Software OctoBot-Interfaces
+#  Drakkar-Software OctoBot-Interfaces#  Drakkar-Software OctoBot-Interfaces
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -14,13 +14,15 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from flask import render_template
 
-from interfaces.trading_util import get_matrix_list
-from . import advanced
+class InterfaceManager:
 
+    @staticmethod
+    def start_interfaces(interfaces):
+        for interface in interfaces:
+            interface.start()
 
-@advanced.route("/matrix")
-def matrix():
-    return render_template('advanced_matrix.html',
-                           matrix_list=get_matrix_list())
+    @staticmethod
+    def stop_interfaces(interfaces):
+        for interface in interfaces:
+            interface.stop()

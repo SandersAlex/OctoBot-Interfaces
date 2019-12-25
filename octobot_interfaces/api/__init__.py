@@ -13,13 +13,3 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
-from flask import render_template
-
-from . import advanced
-
-
-@advanced.route("/")
-@advanced.route("/home")
-def home():
-    return render_template('advanced_index.html')

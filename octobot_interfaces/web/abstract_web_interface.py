@@ -13,12 +13,12 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+from abc import ABC
 
-from flask import Blueprint
+from octobot_interfaces.base.abstract_interface import AbstractInterface
+from tentacles.Interfaces.services import WebService
 
-advanced = Blueprint('advanced', __name__, url_prefix='/advanced', template_folder="../advanced_templates")
 
-from . import home
-from . import configuration
-from . import strategy_optimizer
-from . import matrix
+class AbstractWebInterface(AbstractInterface, ABC):
+    REQUIRED_SERVICE = WebService
+    pass

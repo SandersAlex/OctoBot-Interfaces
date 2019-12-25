@@ -16,3 +16,5 @@
 
 PROJECT_NAME = "OctoBot-Interfaces"
 VERSION = "0.0.0"  # major.minor.revision
+
+PAID_FEES_STR = "Paid fees"

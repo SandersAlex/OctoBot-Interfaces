@@ -13,10 +13,22 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+from octobot_interfaces.base.abstract_interface import AbstractInterface
+from octobot_interfaces.base.interface_factory import InterfaceFactory
+from octobot_interfaces.managers.interface_manager import InterfaceManager
 
-from flask import Blueprint
 
-api = Blueprint('api', __name__, url_prefix='/api', template_folder="")
+def initialize_global_project_data(bot, project_name, project_version):
+    AbstractInterface.initialize_global_project_data(bot, project_name, project_version)
 
-from . import trading
-from . import metadata
+
+def create_interface_factory(config):
+    return InterfaceFactory(config)
+
+
+def start_interfaces(interfaces):
+    InterfaceManager.start_interfaces(interfaces)
+
+
+def stop_interfaces(interfaces):
+    InterfaceManager.stop_interfaces(interfaces)

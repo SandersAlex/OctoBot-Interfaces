@@ -14,10 +14,21 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from flask import make_response
+from octobot_commons.logging.logging_util import get_logger
+from octobot_interfaces.base.abstract_interface import AbstractInterface
+from octobot_services.services.abstract_service import AbstractService
 
 
-def get_rest_reply(json_message, code=200, content_type="application/json"):
-    resp = make_response(json_message, code)
-    resp.headers['Content-Type'] = content_type
-    return resp
+class InterfaceFactory:
+    def __init__(self, config):
+        self.logger = get_logger(self.__class__.__name__)
+        self.config = config
+
+    @staticmethod
+    def get_available_interfaces():
+        return [interface_class
+                for abstract_interface_class in AbstractInterface.__subclasses__()
+                for interface_class in abstract_interface_class.__subclasses__()]
+
+    async def create_interface(self, interface_class):
+        return interface_class(self.config)

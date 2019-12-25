@@ -15,7 +15,7 @@
 #  License along with this library.
 
 
-from tools.config_manager import ConfigManager
+# from tools.config_manager import ConfigManager
 
 
 bot_instance = None
@@ -32,8 +32,8 @@ def __init__(bot, config):
     global_config = config
 
 
-def get_bot():
-    return bot_instance
+# def get_bot():
+#     return bot_instance
 
 
 def get_global_config():
@@ -49,11 +49,11 @@ def get_default_time_frame():
     return default_time_frame
 
 
-def get_reference_market():
-    global reference_market
-    if reference_market is None:
-        try:
-            reference_market = ConfigManager.get_reference_market(global_config)
-        except StopIteration:
-            reference_market = None
-    return reference_market
+# def get_reference_market():
+#     global reference_market
+#     if reference_market is None:
+#         try:
+#             reference_market = ConfigManager.get_reference_market(global_config)
+#         except StopIteration:
+#             reference_market = None
+#     return reference_market
