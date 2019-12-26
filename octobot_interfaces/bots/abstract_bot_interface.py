@@ -19,7 +19,7 @@ from abc import ABC
 
 from octobot_commons.constants import CONFIG_ENABLED_OPTION
 from octobot_interfaces.base.abstract_interface import AbstractInterface
-from octobot_interfaces.util.bot import get_bot
+from octobot_interfaces.util.bot import get_bot, get_global_config
 from octobot_interfaces.util.order import get_all_open_orders, cancel_all_open_orders
 from octobot_interfaces.util.portfolio import get_portfolio_current_value, get_global_portfolio_currencies_amounts
 from octobot_interfaces.util.profitability import get_global_profitability
@@ -53,7 +53,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def _is_valid_user(user_name, associated_config=None):
-        config_interface = get_bot().get_config()[CONFIG_CATEGORY_SERVICES][associated_config]
+        config_interface = get_global_config()[CONFIG_CATEGORY_SERVICES][associated_config]
 
         white_list = config_interface[CONFIG_USERNAMES_WHITELIST] \
             if CONFIG_USERNAMES_WHITELIST in config_interface else None

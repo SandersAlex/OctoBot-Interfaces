@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from octobot_interfaces.util.bot import get_bot
+from octobot_interfaces.util.bot import get_bot, get_global_config
 from octobot_trading.constants import CONFIG_TRADING, CONFIG_TRADER_REFERENCE_MARKET, DEFAULT_REFERENCE_MARKET
 
 from octobot_commons.dict_util import get_value_or_default
@@ -137,7 +137,7 @@ def get_currencies_with_status():
 
 def get_reference_market() -> str:
     # The reference market is the currency unit of the calculated quantity value
-    return get_value_or_default(get_bot().config[CONFIG_TRADING],
+    return get_value_or_default(get_global_config()[CONFIG_TRADING],
                                 CONFIG_TRADER_REFERENCE_MARKET,
                                 DEFAULT_REFERENCE_MARKET)
 

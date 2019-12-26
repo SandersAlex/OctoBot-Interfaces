@@ -33,7 +33,7 @@ def get_global_profitability():
         if is_trader_enabled(exchange_manager):
 
             current_value, _, _, market_average_profitability, initial_portfolio_current_profitability = \
-                run_in_bot_main_loop(get_profitability_stats(exchange_manager))
+                get_profitability_stats(exchange_manager)
 
             if is_trader_simulated(exchange_manager):
                 simulated_full_origin_value += get_origin_portfolio_value(exchange_manager)
