@@ -16,6 +16,7 @@
 from abc import abstractmethod
 
 from octobot_commons.logging.logging_util import get_logger
+from octobot_services.api.services import get_available_services
 from octobot_services.services.service_factory import ServiceFactory
 
 
@@ -35,12 +36,11 @@ class AbstractInterface:
 
     async def initialize(self, backtesting_enabled):
         # init associated service if not already init
-        service_factory = ServiceFactory(self.config)
-        service_list = service_factory.get_available_services()
+        service_list = get_available_services()
         if self.REQUIRED_SERVICE:
             if self.REQUIRED_SERVICE in service_list:
-                service_instance = self.REQUIRED_SERVICE.instance()
-                if await service_factory.create_or_get_service(service_instance, backtesting_enabled):
+                service_factory = ServiceFactory(self.config)
+                if await service_factory.create_or_get_service(self.REQUIRED_SERVICE, backtesting_enabled):
                     await self._post_initialize()
                 else:
                     self.get_logger().error(f"Impossible to start {self.__class__.__name__}: required service "

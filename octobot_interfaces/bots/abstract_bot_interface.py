@@ -19,14 +19,14 @@ from abc import ABC
 
 from octobot_commons.constants import CONFIG_ENABLED_OPTION
 from octobot_interfaces.base.abstract_interface import AbstractInterface
+from octobot_interfaces.util.bot import get_bot
 from octobot_interfaces.util.order import get_all_open_orders, cancel_all_open_orders
 from octobot_interfaces.util.portfolio import get_portfolio_current_value, get_global_portfolio_currencies_amounts
 from octobot_interfaces.util.profitability import get_global_profitability
 from octobot_interfaces.util.trader import has_real_and_or_simulated_traders, get_currencies_with_status, get_risk, \
     force_real_traders_refresh, get_trades_history, set_risk, set_enable_trading, get_total_paid_fees, \
-    sell_all_currencies, sell_all
+    sell_all_currencies, sell_all, get_reference_market
 from octobot_trading.constants import REAL_TRADER_STR, SIMULATOR_TRADER_STR
-from octobot_trading.util import get_reference_market
 from octobot_interfaces.constants import PAID_FEES_STR
 from octobot_services.constants import CONFIG_INTERFACES, CONFIG_CATEGORY_SERVICES, CONFIG_USERNAMES_WHITELIST
 from octobot_interfaces.bots import EOL, NO_CURRENCIES_MESSAGE, NO_TRADER_MESSAGE
@@ -53,7 +53,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def _is_valid_user(user_name, associated_config=None):
-        config_interface = AbstractInterface.bot.get_config()[CONFIG_CATEGORY_SERVICES][associated_config]
+        config_interface = get_bot().get_config()[CONFIG_CATEGORY_SERVICES][associated_config]
 
         white_list = config_interface[CONFIG_USERNAMES_WHITELIST] \
             if CONFIG_USERNAMES_WHITELIST in config_interface else None
@@ -75,25 +75,25 @@ class AbstractBotInterface(AbstractInterface, ABC):
             message += f"{c}- Simulated trader{c}{EOL}"
 
         message += f"{EOL}{b}Exchanges:{b}{EOL}"
-        for exchange in AbstractInterface.bot.get_exchanges_list().values():
+        for exchange in get_bot().get_exchanges_list().values():
             message += f"{c}- {exchange.get_name()}{c}{EOL}"
 
         message += f"{EOL}{b}Evaluators:{b}{EOL}"
-        first_evaluator = next(iter(AbstractInterface.bot.get_symbols_tasks_manager().values())).get_evaluator()
+        first_evaluator = next(iter(get_bot().get_symbols_tasks_manager().values())).get_evaluator()
         evaluators = copy.copy(first_evaluator.get_social_eval_list())
         evaluators += first_evaluator.get_ta_eval_list()
         evaluators += first_evaluator.get_real_time_eval_list()
         for evaluator in evaluators:
             message += f"{c}- {evaluator.get_name()}{c}{EOL}"
 
-        first_symbol_evaluator = next(iter(AbstractInterface.bot.get_symbol_evaluator_list().values()))
-        first_exchange = next(iter(AbstractInterface.bot.get_exchanges_list().values()))
+        first_symbol_evaluator = next(iter(get_bot().get_symbol_evaluator_list().values()))
+        first_exchange = next(iter(get_bot().get_exchanges_list().values()))
         message += f"{EOL}{b}Strategies:{b}{EOL}"
         for strategy in first_symbol_evaluator.get_strategies_eval_list(first_exchange):
             message += f"{c}- {strategy.get_name()}{c}{EOL}"
 
         message += f"{EOL}{b}Trading mode:{b}{EOL}"
-        message += f"{c}- {next(iter(AbstractInterface.bot.get_exchange_trading_modes().values())).get_name()}{c}"
+        message += f"{c}- {next(iter(get_bot().get_exchange_trading_modes().values())).get_name()}{c}"
 
         return message
 
@@ -287,7 +287,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
     @staticmethod
     def get_command_ping():
         return f"I'm alive since " \
-               f"{convert_timestamp_to_datetime(AbstractInterface.bot.start_time, '%Y-%m-%d %H:%M:%S')}."
+               f"{convert_timestamp_to_datetime(get_bot().start_time, '%Y-%m-%d %H:%M:%S')}."
 
     @staticmethod
     def get_command_version():
@@ -310,7 +310,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def set_command_stop():
-        AbstractInterface.bot.stop()
+        get_bot().stop()
         return os._exit(0)
 
     def set_command_pause(self):

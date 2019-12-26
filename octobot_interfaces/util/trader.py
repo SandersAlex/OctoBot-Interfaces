@@ -13,6 +13,12 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+from octobot_interfaces.util.bot import get_bot
+from octobot_trading.constants import CONFIG_TRADING, CONFIG_TRADER_REFERENCE_MARKET, DEFAULT_REFERENCE_MARKET
+
+from octobot_commons.dict_util import get_value_or_default
+
+from octobot_interfaces.base.abstract_interface import AbstractInterface
 from octobot_interfaces.util.util import run_in_bot_main_loop, get_exchange_managers
 from octobot_trading.api.exchange import get_trading_pairs, get_exchange_name, force_refresh_orders_and_portfolio
 from octobot_trading.api.trader import is_trader_simulated, get_trader_risk, is_trader_enabled, set_trader_risk, \
@@ -127,6 +133,13 @@ def get_currencies_with_status():
             evaluations_by_exchange_by_pair[pair][get_exchange_name(exchange_manager)] = \
                 [status_explanation, status_detail]
     return evaluations_by_exchange_by_pair
+
+
+def get_reference_market() -> str:
+    # The reference market is the currency unit of the calculated quantity value
+    return get_value_or_default(get_bot().config[CONFIG_TRADING],
+                                CONFIG_TRADER_REFERENCE_MARKET,
+                                DEFAULT_REFERENCE_MARKET)
 
 
 def get_matrix_list():

@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 from octobot_interfaces.util.util import get_exchange_managers, run_in_bot_main_loop
-from octobot_trading.api.orders import get_open_orders, cancel_order_from_description, \
+from octobot_trading.api.orders import get_open_orders, cancel_order_with_id, \
     cancel_all_open_orders_with_currency
 from octobot_trading.api.trader import is_trader_enabled, is_trader_simulated
 
@@ -33,12 +33,12 @@ def get_all_open_orders():
     return real_open_orders, simulated_open_orders
 
 
-def cancel_orders(orders_desc):
+def cancel_orders(orders_id):
     removed_count = 0
-    if orders_desc:
+    if orders_id:
         for exchange_manager in get_exchange_managers():
             if is_trader_enabled(exchange_manager):
-                removed_count += run_in_bot_main_loop(cancel_order_from_description(exchange_manager, orders_desc))
+                removed_count += 1 if run_in_bot_main_loop(cancel_order_with_id(exchange_manager, orders_id)) else 0
     return removed_count
 
 

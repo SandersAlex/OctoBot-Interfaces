@@ -13,21 +13,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import threading
 
 from octobot_interfaces.base.abstract_interface import AbstractInterface
-from octobot_interfaces.util.bot import get_bot
 
 
-def get_exchange_managers(bot=None):
-    if bot is None:
-        return AbstractInterface.get_exchange_managers()
-    else:
-        return bot.exchange_factory.exchange_manager_list
+def get_bot():
+    return AbstractInterface.bot
 
 
-def run_in_bot_main_loop(coroutine, blocking=True):
-    if blocking:
-        return get_bot().run_in_main_asyncio_loop(coroutine)
-    else:
-        threading.Thread(target=get_bot().run_in_main_asyncio_loop, args=coroutine).start()
+def get_global_config():
+    return get_bot().config
