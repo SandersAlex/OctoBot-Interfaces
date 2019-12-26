@@ -15,7 +15,7 @@
 #  License along with this library.
 from octobot_interfaces.util.util import get_exchange_managers, run_in_bot_main_loop
 from octobot_trading.api.orders import get_open_orders, cancel_order_with_id, \
-    cancel_all_open_orders_with_currency
+    cancel_all_open_orders_with_currency, cancel_all_open_orders as api_cancel_all_open_orders
 from octobot_trading.api.trader import is_trader_enabled, is_trader_simulated
 
 
@@ -46,6 +46,6 @@ def cancel_all_open_orders(currency=None):
     for exchange_manager in get_exchange_managers():
         if is_trader_enabled(exchange_manager):
             if currency is None:
-                run_in_bot_main_loop(cancel_all_open_orders(exchange_manager))
+                run_in_bot_main_loop(api_cancel_all_open_orders(exchange_manager))
             else:
                 run_in_bot_main_loop(cancel_all_open_orders_with_currency(exchange_manager, currency))

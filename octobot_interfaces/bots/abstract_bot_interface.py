@@ -18,6 +18,8 @@ import os
 from abc import ABC
 
 from octobot_commons.constants import CONFIG_ENABLED_OPTION
+from octobot_evaluators.api import get_evaluator_classes_with_type
+from octobot_evaluators.enums import EvaluatorMatrixTypes
 from octobot_interfaces.base.abstract_interface import AbstractInterface
 from octobot_interfaces.util.bot import get_bot, get_global_config
 from octobot_interfaces.util.order import get_all_open_orders, cancel_all_open_orders
@@ -26,6 +28,10 @@ from octobot_interfaces.util.profitability import get_global_profitability
 from octobot_interfaces.util.trader import has_real_and_or_simulated_traders, get_currencies_with_status, get_risk, \
     force_real_traders_refresh, get_trades_history, set_risk, set_enable_trading, get_total_paid_fees, \
     sell_all_currencies, sell_all, get_reference_market
+from octobot_trading.api.exchange import get_exchange_names
+from octobot_trading.api.orders import get_order_exchange_name
+from octobot_trading.api.trades import get_trade_exchange_name
+from octobot_trading.api.modes import get_activated_trading_mode
 from octobot_trading.constants import REAL_TRADER_STR, SIMULATOR_TRADER_STR
 from octobot_interfaces.constants import PAID_FEES_STR
 from octobot_services.constants import CONFIG_INTERFACES, CONFIG_CATEGORY_SERVICES, CONFIG_USERNAMES_WHITELIST
@@ -75,25 +81,22 @@ class AbstractBotInterface(AbstractInterface, ABC):
             message += f"{c}- Simulated trader{c}{EOL}"
 
         message += f"{EOL}{b}Exchanges:{b}{EOL}"
-        for exchange in get_bot().get_exchanges_list().values():
-            message += f"{c}- {exchange.get_name()}{c}{EOL}"
+        for exchange_name in get_exchange_names():
+            message += f"{c}- {exchange_name.capitalize()}{c}{EOL}"
 
         message += f"{EOL}{b}Evaluators:{b}{EOL}"
-        first_evaluator = next(iter(get_bot().get_symbols_tasks_manager().values())).get_evaluator()
-        evaluators = copy.copy(first_evaluator.get_social_eval_list())
-        evaluators += first_evaluator.get_ta_eval_list()
-        evaluators += first_evaluator.get_real_time_eval_list()
+        evaluators = get_evaluator_classes_with_type(EvaluatorMatrixTypes.TA.value, get_global_config())
+        evaluators += get_evaluator_classes_with_type(EvaluatorMatrixTypes.SOCIAL.value, get_global_config())
+        evaluators += get_evaluator_classes_with_type(EvaluatorMatrixTypes.REAL_TIME.value, get_global_config())
         for evaluator in evaluators:
             message += f"{c}- {evaluator.get_name()}{c}{EOL}"
 
-        first_symbol_evaluator = next(iter(get_bot().get_symbol_evaluator_list().values()))
-        first_exchange = next(iter(get_bot().get_exchanges_list().values()))
         message += f"{EOL}{b}Strategies:{b}{EOL}"
-        for strategy in first_symbol_evaluator.get_strategies_eval_list(first_exchange):
+        for strategy in get_evaluator_classes_with_type(EvaluatorMatrixTypes.STRATEGIES.value, get_global_config()):
             message += f"{c}- {strategy.get_name()}{c}{EOL}"
 
         message += f"{EOL}{b}Trading mode:{b}{EOL}"
-        message += f"{c}- {next(iter(get_bot().get_exchange_trading_modes().values())).get_name()}{c}"
+        message += f"{c}- {get_activated_trading_mode(get_global_config()).get_name()}{c}"
 
         return message
 
@@ -119,7 +122,9 @@ class AbstractBotInterface(AbstractInterface, ABC):
         trades_history_string = f"{b}{trader_str}{b}{c}Trades :{EOL}{c}"
         if trades_history:
             for trade in trades_history:
-                trades_history_string += f"{PrettyPrinter.trade_pretty_printer(trade, markdown=markdown)}{EOL}"
+                exchange_name = get_trade_exchange_name(trade)
+                trades_history_string += \
+                    f"{PrettyPrinter.trade_pretty_printer(exchange_name, trade, markdown=markdown)}{EOL}"
         else:
             trades_history_string += f"{c}No trade yet.{c}"
         return trades_history_string
@@ -148,7 +153,10 @@ class AbstractBotInterface(AbstractInterface, ABC):
         orders_string = f"{b}{trader_str}{b}{c}Open orders :{c}{EOL}"
         if open_orders:
             for order in open_orders:
-                orders_string += PrettyPrinter.open_order_pretty_printer(order, markdown=markdown) + EOL
+                exchange_name = get_order_exchange_name(order).capitalize()
+                orders_string += PrettyPrinter.open_order_pretty_printer(exchange_name,
+                                                                         order,
+                                                                         markdown=markdown) + EOL
         else:
             orders_string += f"{c}No open order yet.{c}"
         return orders_string
@@ -310,7 +318,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def set_command_stop():
-        get_bot().stop()
+        get_bot().task_manager.stop_tasks()
         return os._exit(0)
 
     def set_command_pause(self):
