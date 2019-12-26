@@ -18,17 +18,17 @@ from octobot_interfaces.base.interface_factory import InterfaceFactory
 from octobot_interfaces.managers.interface_manager import InterfaceManager
 
 
-def initialize_global_project_data(bot, project_name, project_version):
+def initialize_global_project_data(bot, project_name, project_version) -> None:
     AbstractInterface.initialize_global_project_data(bot, project_name, project_version)
 
 
-def create_interface_factory(config):
+def create_interface_factory(config) -> InterfaceFactory:
     return InterfaceFactory(config)
 
 
-def start_interfaces(interfaces):
+def start_interfaces(interfaces) -> None:
     InterfaceManager.start_interfaces(interfaces)
 
 
-def stop_interfaces(interfaces):
+def stop_interfaces(interfaces) -> None:
     InterfaceManager.stop_interfaces(interfaces)
