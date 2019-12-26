@@ -26,6 +26,20 @@ def create_interface_factory(config) -> InterfaceFactory:
     return InterfaceFactory(config)
 
 
+def is_enabled(interface_class) -> bool:
+    return interface_class.enabled
+
+
+def disable_interfaces(interface_identifier) -> int:
+    disabled_interfaces = 0
+    normalized_identifier = interface_identifier.lower()
+    for interface_class in InterfaceFactory.get_available_interfaces():
+        if normalized_identifier in interface_class.__name__.lower():
+            interface_class.enabled = False
+            disabled_interfaces += 1
+    return disabled_interfaces
+
+
 def start_interfaces(interfaces) -> None:
     InterfaceManager.start_interfaces(interfaces)
 

@@ -29,6 +29,7 @@ class AbstractInterface:
     bot = None
     project_name = None
     project_version = None
+    enabled = True
 
     def __init__(self, config):
         self.config = config
