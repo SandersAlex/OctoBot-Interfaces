@@ -70,13 +70,17 @@ class AbstractInterface:
         return AbstractInterface.bot.initialized
 
     @classmethod
+    def get_name(cls):
+        return cls.__name__
+
+    @classmethod
     def get_logger(cls):
-        return get_logger(cls.__name__)
+        return get_logger(cls.get_name())
 
     @abstractmethod
     def start(self):
-        raise NotImplementedError("start is not implemented")
+        raise NotImplementedError(f"start is not implemented for {self.get_name()}")
 
     @abstractmethod
     def stop(self):
-        raise NotImplementedError("stop is not implemented")
+        raise NotImplementedError(f"stop is not implemented for {self.get_name()}")
