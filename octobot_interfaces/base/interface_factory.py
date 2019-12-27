@@ -15,8 +15,8 @@
 #  License along with this library.
 
 from octobot_commons.logging.logging_util import get_logger
+from octobot_commons.tentacles_management import get_all_classes_from_parent
 from octobot_interfaces.base.abstract_interface import AbstractInterface
-from octobot_services.services.abstract_service import AbstractService
 
 
 class InterfaceFactory:
@@ -26,9 +26,7 @@ class InterfaceFactory:
 
     @staticmethod
     def get_available_interfaces():
-        return [interface_class
-                for abstract_interface_class in AbstractInterface.__subclasses__()
-                for interface_class in abstract_interface_class.__subclasses__()]
+        return get_all_classes_from_parent(AbstractInterface)
 
     async def create_interface(self, interface_class):
         return interface_class(self.config)
