@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import copy
 import os
 from abc import ABC
 
@@ -70,7 +69,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def get_command_configuration(markdown=False):
-        _, b, c = PrettyPrinter.get_markets(markdown)
+        _, b, c = PrettyPrinter.get_markers(markdown)
         message = f"{b}My configuration:{b}{EOL}{EOL}"
 
         message += f"{b}Traders: {b}{EOL}"
@@ -102,7 +101,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def get_command_market_status(markdown=False):
-        _, b, c = PrettyPrinter.get_markets(markdown)
+        _, b, c = PrettyPrinter.get_markers(markdown)
         message = f"{b}My cryptocurrencies evaluations are:{b} {EOL}{EOL}"
         at_least_one_currency = False
         for currency_pair, currency_info in get_currencies_with_status().items():
@@ -118,7 +117,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def _print_trades(trades_history, trader_str, markdown=False):
-        _, b, c = PrettyPrinter.get_markets(markdown)
+        _, b, c = PrettyPrinter.get_markers(markdown)
         trades_history_string = f"{b}{trader_str}{b}{c}Trades :{EOL}{c}"
         if trades_history:
             for trade in trades_history:
@@ -149,7 +148,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def _print_open_orders(open_orders, trader_str, markdown=False):
-        _, b, c = PrettyPrinter.get_markets(markdown)
+        _, b, c = PrettyPrinter.get_markers(markdown)
         orders_string = f"{b}{trader_str}{b}{c}Open orders :{c}{EOL}"
         if open_orders:
             for order in open_orders:
@@ -163,7 +162,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def get_command_open_orders(markdown=False):
-        _, b, c = PrettyPrinter.get_markets(markdown)
+        _, b, c = PrettyPrinter.get_markers(markdown)
         has_real_trader, has_simulated_trader = has_real_and_or_simulated_traders()
         portfolio_real_open_orders, portfolio_simulated_open_orders = get_all_open_orders()
 
@@ -186,7 +185,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def get_command_fees(markdown=False):
-        _, b, _ = PrettyPrinter.get_markets(markdown)
+        _, b, _ = PrettyPrinter.get_markers(markdown)
         real_trader_fees, simulated_trader_fees = get_total_paid_fees()
         result_str = ""
         if real_trader_fees is not None:
@@ -225,7 +224,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def _print_portfolio(current_val, ref_market, portfolio, trader_str, markdown=False):
-        _, b, c = PrettyPrinter.get_markets(markdown)
+        _, b, c = PrettyPrinter.get_markers(markdown)
         portfolios_string = f"{b}{trader_str}{b}Portfolio value : " \
             f"{b}{PrettyPrinter.get_min_string_from_number(current_val)} {ref_market}{b}" \
             f"{EOL}"
@@ -237,7 +236,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def get_command_portfolio(markdown=False):
-        _, b, c = PrettyPrinter.get_markets(markdown)
+        _, b, c = PrettyPrinter.get_markers(markdown)
         has_real_trader, has_simulated_trader, \
           portfolio_real_current_value, portfolio_simulated_current_value = get_portfolio_current_value()
         reference_market = get_reference_market()
@@ -260,7 +259,7 @@ class AbstractBotInterface(AbstractInterface, ABC):
 
     @staticmethod
     def get_command_profitability(markdown=False):
-        _, b, c = PrettyPrinter.get_markets(markdown)
+        _, b, c = PrettyPrinter.get_markers(markdown)
         has_real_trader, has_simulated_trader, \
             real_global_profitability, simulated_global_profitability, \
             real_percent_profitability, simulated_percent_profitability, \

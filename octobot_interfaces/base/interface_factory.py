@@ -14,14 +14,12 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from octobot_commons.logging.logging_util import get_logger
 from octobot_commons.tentacles_management import get_all_classes_from_parent
 from octobot_interfaces.base.abstract_interface import AbstractInterface
 
 
 class InterfaceFactory:
     def __init__(self, config):
-        self.logger = get_logger(self.__class__.__name__)
         self.config = config
 
     @staticmethod
