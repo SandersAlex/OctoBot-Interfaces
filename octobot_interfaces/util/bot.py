@@ -23,3 +23,11 @@ def get_bot():
 
 def get_global_config():
     return get_bot().config
+
+
+def get_startup_config():
+    return get_bot().startup_config
+
+
+def get_edited_config():
+    return get_bot().edited_config
