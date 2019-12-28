@@ -13,12 +13,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from abc import ABC
+from abc import ABCMeta
 
 from octobot_interfaces.base.abstract_interface import AbstractInterface
 from tentacles.Interfaces.services import WebService
 
 
-class AbstractWebInterface(AbstractInterface, ABC):
+class AbstractWebInterface(AbstractInterface):
+    __metaclass__ = ABCMeta
     REQUIRED_SERVICE = WebService
     pass

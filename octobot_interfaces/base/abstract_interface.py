@@ -13,12 +13,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from abc import abstractmethod
+from abc import abstractmethod, ABCMeta
 
 from octobot_services.abstract_service_user import AbstractServiceUser
 
 
 class AbstractInterface(AbstractServiceUser):
+    __metaclass__ = ABCMeta
     # The service required to run this interface
     REQUIRED_SERVICE = None
 

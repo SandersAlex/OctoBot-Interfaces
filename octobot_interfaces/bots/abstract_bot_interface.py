@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import os
-from abc import ABC
+from abc import ABCMeta
 
 from octobot_commons.constants import CONFIG_ENABLED_OPTION
 from octobot_evaluators.api import get_evaluator_classes_with_type
@@ -39,7 +39,8 @@ from octobot_commons.pretty_printer import PrettyPrinter
 from octobot_commons.timestamp_util import convert_timestamp_to_datetime
 
 
-class AbstractBotInterface(AbstractInterface, ABC):
+class AbstractBotInterface(AbstractInterface):
+    __metaclass__ = ABCMeta
 
     @staticmethod
     def enable(config, is_enabled, associated_config=None):
