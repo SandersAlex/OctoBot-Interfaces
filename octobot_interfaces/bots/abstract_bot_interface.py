@@ -17,8 +17,6 @@ import os
 from abc import ABCMeta
 
 from octobot_commons.constants import CONFIG_ENABLED_OPTION
-from octobot_evaluators.api import get_evaluator_classes_with_type
-from octobot_evaluators.enums import EvaluatorMatrixTypes
 from octobot_interfaces.base.abstract_interface import AbstractInterface
 from octobot_interfaces.util.bot import get_bot, get_global_config
 from octobot_interfaces.util.order import get_all_open_orders, cancel_all_open_orders
@@ -84,16 +82,22 @@ class AbstractBotInterface(AbstractInterface):
         for exchange_name in get_exchange_names():
             message += f"{c}- {exchange_name.capitalize()}{c}{EOL}"
 
-        message += f"{EOL}{b}Evaluators:{b}{EOL}"
-        evaluators = get_evaluator_classes_with_type(EvaluatorMatrixTypes.TA.value, get_global_config())
-        evaluators += get_evaluator_classes_with_type(EvaluatorMatrixTypes.SOCIAL.value, get_global_config())
-        evaluators += get_evaluator_classes_with_type(EvaluatorMatrixTypes.REAL_TIME.value, get_global_config())
-        for evaluator in evaluators:
-            message += f"{c}- {evaluator.get_name()}{c}{EOL}"
+        try:
+            from octobot_evaluators.api import get_evaluator_classes_with_type
+            from octobot_evaluators.enums import EvaluatorMatrixTypes
+            message += f"{EOL}{b}Evaluators:{b}{EOL}"
+            evaluators = get_evaluator_classes_with_type(EvaluatorMatrixTypes.TA.value, get_global_config())
+            evaluators += get_evaluator_classes_with_type(EvaluatorMatrixTypes.SOCIAL.value, get_global_config())
+            evaluators += get_evaluator_classes_with_type(EvaluatorMatrixTypes.REAL_TIME.value, get_global_config())
+            for evaluator in evaluators:
+                message += f"{c}- {evaluator.get_name()}{c}{EOL}"
 
-        message += f"{EOL}{b}Strategies:{b}{EOL}"
-        for strategy in get_evaluator_classes_with_type(EvaluatorMatrixTypes.STRATEGIES.value, get_global_config()):
-            message += f"{c}- {strategy.get_name()}{c}{EOL}"
+            message += f"{EOL}{b}Strategies:{b}{EOL}"
+            for strategy in get_evaluator_classes_with_type(EvaluatorMatrixTypes.STRATEGIES.value, get_global_config()):
+                message += f"{c}- {strategy.get_name()}{c}{EOL}"
+        except ImportError:
+            message += f"{EOL}{b}Impossible to retrieve evaluation configuration: requires OctoBot-Evaluators " \
+                       f"package installed{b}{EOL}"
 
         message += f"{EOL}{b}Trading mode:{b}{EOL}"
         message += f"{c}- {get_activated_trading_mode(get_global_config()).get_name()}{c}"

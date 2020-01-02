@@ -16,10 +16,8 @@
 from abc import ABCMeta
 
 from octobot_interfaces.base.abstract_interface import AbstractInterface
-from tentacles.Interfaces.services import WebService
 
 
 class AbstractWebInterface(AbstractInterface):
     __metaclass__ = ABCMeta
-    REQUIRED_SERVICE = WebService
     pass
