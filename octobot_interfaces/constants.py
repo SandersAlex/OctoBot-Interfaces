@@ -14,9 +14,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Interfaces"
-VERSION = "1.0.0"  # major.minor.revision
-
 PAID_FEES_STR = "Paid fees"
 
 # external resources

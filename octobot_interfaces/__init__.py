@@ -14,25 +14,5 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-
-global_config = None
-default_time_frame = None
-
-
-def __init__(bot, config):
-
-    global global_config
-    global_config = config
-
-
-def get_global_config():
-    return global_config
-
-
-def set_default_time_frame(time_frame):
-    global default_time_frame
-    default_time_frame = time_frame
-
-
-def get_default_time_frame():
-    return default_time_frame
+PROJECT_NAME = "OctoBot-Interfaces"
+VERSION = "1.0.0"  # major.minor.revision
