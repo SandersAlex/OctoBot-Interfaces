@@ -33,12 +33,13 @@ def get_all_open_orders():
     return real_open_orders, simulated_open_orders
 
 
-def cancel_orders(orders_id):
+def cancel_orders(order_ids):
     removed_count = 0
-    if orders_id:
-        for exchange_manager in get_exchange_managers():
-            if is_trader_enabled(exchange_manager):
-                removed_count += 1 if run_in_bot_main_loop(cancel_order_with_id(exchange_manager, orders_id)) else 0
+    if order_ids:
+        for id in order_ids:
+            for exchange_manager in get_exchange_managers():
+                if is_trader_enabled(exchange_manager):
+                    removed_count += 1 if run_in_bot_main_loop(cancel_order_with_id(exchange_manager, id)) else 0
     return removed_count
 
 
