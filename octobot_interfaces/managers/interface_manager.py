@@ -1,4 +1,4 @@
-#  Drakkar-Software OctoBot-Interfaces#  Drakkar-Software OctoBot-Interfaces
+#  Drakkar-Software OctoBot-Interfaces
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -15,14 +15,14 @@
 #  License along with this library.
 
 
-class InterfaceManager:
+async def start_interfaces(interfaces: list):
+    started_interfaces = []
+    for interface in interfaces:
+        if await interface.start():
+            started_interfaces.append(interface)
+    return started_interfaces
 
-    @staticmethod
-    def start_interfaces(interfaces):
-        for interface in interfaces:
-            interface.start()
 
-    @staticmethod
-    def stop_interfaces(interfaces):
-        for interface in interfaces:
-            interface.stop()
+async def stop_interfaces(interfaces: list):
+    for interface in interfaces:
+        await interface.stop()

@@ -24,10 +24,10 @@ class InterfaceFactory:
         self.config = config
 
     @staticmethod
-    def get_available_interfaces():
+    def get_available_interfaces() -> list:
         return [interface_class
                 for interface_class in get_all_classes_from_parent(AbstractInterface)
                 if not is_abstract_using_inspection_and_class_naming(interface_class)]
 
-    async def create_interface(self, interface_class):
+    async def create_interface(self, interface_class) -> AbstractInterface:
         return interface_class(self.config)

@@ -15,22 +15,23 @@
 #  License along with this library.
 from octobot_interfaces.base.abstract_interface import AbstractInterface
 from octobot_interfaces.base.interface_factory import InterfaceFactory
-from octobot_interfaces.managers.interface_manager import InterfaceManager
+from octobot_interfaces.managers.interface_manager import start_interfaces as manager_start_interfaces, \
+    stop_interfaces as manager_stop_interfaces
 
 
-def initialize_global_project_data(bot, project_name, project_version) -> None:
+def initialize_global_project_data(bot: object, project_name: str, project_version: str) -> None:
     AbstractInterface.initialize_global_project_data(bot, project_name, project_version)
 
 
-def create_interface_factory(config) -> InterfaceFactory:
+def create_interface_factory(config: dict) -> InterfaceFactory:
     return InterfaceFactory(config)
 
 
-def is_enabled(interface_class) -> bool:
+def is_enabled(interface_class: AbstractInterface) -> bool:
     return interface_class.enabled
 
 
-def disable_interfaces(interface_identifier) -> int:
+def disable_interfaces(interface_identifier: str) -> int:
     disabled_interfaces = 0
     normalized_identifier = interface_identifier.lower()
     for interface_class in InterfaceFactory.get_available_interfaces():
@@ -40,9 +41,10 @@ def disable_interfaces(interface_identifier) -> int:
     return disabled_interfaces
 
 
-def start_interfaces(interfaces) -> None:
-    InterfaceManager.start_interfaces(interfaces)
+# Return the list of started interfaces
+async def start_interfaces(interfaces: list) -> list:
+    return await manager_start_interfaces(interfaces)
 
 
-def stop_interfaces(interfaces) -> None:
-    InterfaceManager.stop_interfaces(interfaces)
+async def stop_interfaces(interfaces: list) -> None:
+    await manager_stop_interfaces(interfaces)

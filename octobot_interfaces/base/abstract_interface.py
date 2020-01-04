@@ -16,9 +16,10 @@
 from abc import abstractmethod, ABCMeta
 
 from octobot_services.abstract_service_user import AbstractServiceUser
+from octobot_services.util.returning_startable import ReturningStartable
 
 
-class AbstractInterface(AbstractServiceUser):
+class AbstractInterface(AbstractServiceUser, ReturningStartable):
     __metaclass__ = ABCMeta
     # The service required to run this interface
     REQUIRED_SERVICE = None
@@ -44,9 +45,5 @@ class AbstractInterface(AbstractServiceUser):
         return AbstractInterface.bot.initialized
 
     @abstractmethod
-    def start(self):
-        raise NotImplementedError(f"start is not implemented for {self.get_name()}")
-
-    @abstractmethod
-    def stop(self):
+    async def stop(self):
         raise NotImplementedError(f"stop is not implemented for {self.get_name()}")
